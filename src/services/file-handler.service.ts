@@ -1,6 +1,7 @@
-import {BindingScope, config, ContextTags, injectable, Provider} from '@loopback/core';
+import {BindingScope, ContextTags, inject, injectable, Provider} from '@loopback/core';
 import multer from 'multer';
-import {FILE_UPLOAD_HANDLER} from '../keys';
+import path from 'path';
+import {FILE_UPLOAD_HANDLER, STORAGE_DIRECTORY} from '../keys';
 import {FileUploadHandler} from '../types';
 
 /**
@@ -11,14 +12,17 @@ import {FileUploadHandler} from '../types';
   tags: {[ContextTags.KEY]: FILE_UPLOAD_HANDLER},
 })
 export class FileUploadProvider implements Provider<FileUploadHandler> {
-  constructor(@config() private options: multer.Options = {}) {
-    if (!this.options.storage) {
-      // Default to in-memory storage
-      this.options.storage = multer.memoryStorage();
-    }
+  constructor(@inject(STORAGE_DIRECTORY) private storageDirectory: string) {
   }
 
   value(): FileUploadHandler {
-    return multer(this.options).any();
+    return multer({
+      storage: multer.diskStorage({
+        destination: path.join(__dirname, this.storageDirectory),
+        filename: (req, file, cb) => {
+          cb(null, file.originalname);
+        },
+      })
+    }).any();
   }
 }

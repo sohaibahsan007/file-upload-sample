@@ -1,5 +1,5 @@
 import {inject, service} from '@loopback/core';
-import {HttpErrors, post, Request, requestBody, Response, RestBindings} from '@loopback/rest';
+import {HttpErrors, param, post, Request, requestBody, Response, RestBindings} from '@loopback/rest';
 import {FileUploadService} from '../services/file-upload.service';
 
 export class FileUploadController {
@@ -24,6 +24,7 @@ export class FileUploadController {
   })
   async upload(
     @requestBody.file() request: Request,
+    @param.query.string('dirName') dirName: string,
     @inject(RestBindings.Http.RESPONSE) response: Response
   ): Promise<{url: string}> {
     try {

@@ -13,8 +13,7 @@ export interface IFileUploadService {
 export class FileUploadService implements IFileUploadService {
 
   constructor(
-    @service(FileUploadProvider)
-    private handler: FileUploadHandler
+    @service(FileUploadProvider) private handler: FileUploadHandler
   ) { }
 
   async uploadFile(
@@ -23,7 +22,7 @@ export class FileUploadService implements IFileUploadService {
   ): Promise<{url: string}> {
     return new Promise<{url: string}>((resolve, reject) => {
       this.handler(request, response, (error: unknown) => {
-        if (error) reject({error: error});
+        if (error) reject({error});
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const uploadedFiles = request.files as any;
