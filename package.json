@@ -49,15 +49,17 @@
     "!*/__tests__"
   ],
   "dependencies": {
+    "@loopback/authentication": "^8.0.0",
+    "@loopback/authentication-jwt": "^0.10.0",
     "@loopback/boot": "^3.4.4",
     "@loopback/core": "^2.18.0",
     "@loopback/repository": "^3.7.3",
     "@loopback/rest": "^10.1.0",
     "@loopback/rest-explorer": "^3.3.4",
     "@loopback/service-proxy": "^3.2.4",
-    "tslib": "^2.0.0",
     "@types/multer": "^1.4.5",
-    "multer": "^1.4.2"
+    "multer": "^1.4.2",
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@loopback/build": "^7.0.2",

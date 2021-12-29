@@ -1,4 +1,5 @@
 import {BindingScope, ContextTags, inject, injectable, Provider} from '@loopback/core';
+import {SecurityBindings, UserProfile} from '@loopback/security';
 import multer from 'multer';
 import path from 'path';
 import {FILE_UPLOAD_HANDLER, STORAGE_DIRECTORY} from '../keys';
@@ -12,10 +13,14 @@ import {FileUploadHandler} from '../types';
   tags: {[ContextTags.KEY]: FILE_UPLOAD_HANDLER},
 })
 export class FileUploadProvider implements Provider<FileUploadHandler> {
-  constructor(@inject(STORAGE_DIRECTORY) private storageDirectory: string) {
+  constructor(
+    @inject(STORAGE_DIRECTORY) private storageDirectory: string,
+    @inject(SecurityBindings.USER, {optional: true}) public user: UserProfile
+  ) {
   }
 
   value(): FileUploadHandler {
+    console.log(this.user);
     return multer({
       storage: multer.diskStorage({
         destination: path.join(__dirname, this.storageDirectory),

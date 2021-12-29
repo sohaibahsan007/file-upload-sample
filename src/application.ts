@@ -1,3 +1,5 @@
+import {AuthenticationComponent} from '@loopback/authentication';
+import {JWTAuthenticationComponent, MyUserService, UserServiceBindings} from '@loopback/authentication-jwt';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {RepositoryMixin} from '@loopback/repository';
@@ -8,6 +10,7 @@ import {
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
+import {DbDataSource} from './datasources';
 import {STORAGE_DIRECTORY} from './keys';
 import {MySequence} from './sequence';
 
@@ -44,5 +47,10 @@ export class FileSampleApplication extends BootMixin(
         nested: true,
       },
     };
+
+    this.component(AuthenticationComponent);
+    this.component(JWTAuthenticationComponent);
+    this.dataSource(DbDataSource, UserServiceBindings.DATASOURCE_NAME);
+    this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
   }
 }
