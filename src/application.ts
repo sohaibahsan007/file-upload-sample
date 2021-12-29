@@ -11,7 +11,6 @@ import {
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {DbDataSource} from './datasources';
-import {STORAGE_DIRECTORY} from './keys';
 import {MySequence} from './sequence';
 
 export {ApplicationConfig};
@@ -33,9 +32,6 @@ export class FileSampleApplication extends BootMixin(
       path: '/explorer',
     });
     this.component(RestExplorerComponent);
-
-    // Default storage directory
-    this.bind(STORAGE_DIRECTORY).to('../../.sandbox');
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here

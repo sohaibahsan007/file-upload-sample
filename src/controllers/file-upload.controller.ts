@@ -1,13 +1,18 @@
+import {authenticate} from '@loopback/authentication';
 import {inject, service} from '@loopback/core';
-import {HttpErrors, param, post, Request, requestBody, Response, RestBindings} from '@loopback/rest';
+import {HttpErrors, post, Request, requestBody, Response, RestBindings} from '@loopback/rest';
+import {SecurityBindings, UserProfile} from '@loopback/security';
 import {FileUploadService} from '../services/file-upload.service';
 
 export class FileUploadController {
   constructor(
     @service(FileUploadService)
-    private fileUploadService: FileUploadService
+    private fileUploadService: FileUploadService,
+    @inject(SecurityBindings.USER, {optional: true})
+    public user: UserProfile,
   ) { }
 
+  @authenticate('jwt')
   @post('/file', {
     responses: {
       200: {
@@ -24,7 +29,6 @@ export class FileUploadController {
   })
   async upload(
     @requestBody.file() request: Request,
-    @param.query.string('dirName') dirName: string,
     @inject(RestBindings.Http.RESPONSE) response: Response
   ): Promise<{url: string}> {
     try {

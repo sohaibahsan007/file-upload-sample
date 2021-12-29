@@ -1,7 +1,9 @@
-import {service} from '@loopback/core';
+import {inject} from '@loopback/core';
 import {Request, Response} from '@loopback/rest';
-import {FileUploadHandler} from '../types';
-import {FileUploadProvider} from './file-handler.service';
+import {SecurityBindings, UserProfile} from '@loopback/security';
+import fs from 'fs';
+import multer from 'multer';
+import path from 'path';
 
 export interface IFileUploadService {
   uploadFile(
@@ -13,7 +15,7 @@ export interface IFileUploadService {
 export class FileUploadService implements IFileUploadService {
 
   constructor(
-    @service(FileUploadProvider) private handler: FileUploadHandler
+    @inject(SecurityBindings.USER) private currentUserProfile: UserProfile
   ) { }
 
   async uploadFile(
@@ -21,14 +23,41 @@ export class FileUploadService implements IFileUploadService {
     response: Response
   ): Promise<{url: string}> {
     return new Promise<{url: string}>((resolve, reject) => {
-      this.handler(request, response, (error: unknown) => {
-        if (error) reject({error});
+
+      const multerRef = multer({
+        storage: multer.diskStorage({
+          // File directory will be set here
+          // Either provide a string
+          // destination: path.join(__dirname + '../../.files'),
+          // Or function
+          // Note: You are responsible for creating the directory when providing destination as a function.
+          // When passing a string, multer will make sure that the directory is created for you.
+          destination: (req, file, cb) => {
+            // Get File extension
+            const fileExt = file.originalname.split('.').pop() as string;
+            const pathDir = path.join(__dirname + '../../../.files', fileExt, this.currentUserProfile['id']);
+            // Use recursive when creating sub directories
+            fs.mkdir(pathDir, {recursive: true}, (err) => {
+              cb(null, pathDir);
+            });
+          },
+          filename: (req, file, cb) => {
+            cb(null, file.originalname);
+          },
+        })
+      }).any();
+
+      // This code should be executed after you have finalized destination directory
+      multerRef(request, response, (error: unknown) => {
+        if (error) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          console.log((error as any).message);
+          reject({error})
+        };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const uploadedFiles = request.files as any;
+        const uploadedFiles = request.files as any[];
         const file = uploadedFiles[0];
-
-        // Check if form data contains file
         if (file) {
           resolve({url: file.originalname});
         } else {
