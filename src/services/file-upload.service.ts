@@ -36,7 +36,8 @@ export class FileUploadService implements IFileUploadService {
             // Get File extension
             const fileExt = file.originalname.split('.').pop() as string;
             const pathDir = path.join(__dirname + '../../../.files', fileExt, this.currentUserProfile['id']);
-            // Use recursive when creating sub directories
+            // Create destination directory
+            // Use recursive to create sub directories
             fs.mkdir(pathDir, {recursive: true}, (err) => {
               cb(null, pathDir);
             });
