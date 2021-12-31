@@ -11,6 +11,7 @@ import {
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {DbDataSource} from './datasources';
+import {STORAGE_DIRECTORY} from './keys';
 import {MySequence} from './sequence';
 
 export {ApplicationConfig};
@@ -48,5 +49,7 @@ export class FileSampleApplication extends BootMixin(
     this.component(JWTAuthenticationComponent);
     this.dataSource(DbDataSource, UserServiceBindings.DATASOURCE_NAME);
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
+
+    this.bind(STORAGE_DIRECTORY).to('../../../files');
   }
 }

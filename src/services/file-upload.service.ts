@@ -4,6 +4,7 @@ import {SecurityBindings, UserProfile} from '@loopback/security';
 import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
+import {STORAGE_DIRECTORY} from '../keys';
 
 export interface IFileUploadService {
   uploadFile(
@@ -15,7 +16,8 @@ export interface IFileUploadService {
 export class FileUploadService implements IFileUploadService {
 
   constructor(
-    @inject(SecurityBindings.USER) private currentUserProfile: UserProfile
+    @inject(SecurityBindings.USER) private currentUserProfile: UserProfile,
+    @inject(STORAGE_DIRECTORY) private storageDirectory: string
   ) { }
 
   async uploadFile(
@@ -35,7 +37,7 @@ export class FileUploadService implements IFileUploadService {
           destination: (req, file, cb) => {
             // Get File extension
             const fileExt = file.originalname.split('.').pop() as string;
-            const pathDir = path.join(__dirname + '../../../.files', fileExt, this.currentUserProfile['id']);
+            const pathDir = path.join(__dirname + this.storageDirectory, fileExt, this.currentUserProfile['id']);
             // Create destination directory
             // Use recursive to create sub directories
             fs.mkdir(pathDir, {recursive: true}, (err) => {
